@@ -1,0 +1,3 @@
+const calculateUuidColor = (uuid: string) => {
+    
+}

@@ -11,6 +11,15 @@ importers:
       better-sqlite3:
         specifier: ^12.11.1
         version: 12.11.1
+      kysely:
+        specifier: ^0.29.4
+        version: 0.29.4
+      svelte-awesome-color-picker:
+        specifier: ^4.1.3
+        version: 4.1.3(svelte@5.56.7)
+      zstd-napi:
+        specifier: ^0.0.13
+        version: 0.0.13
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^7.0.1
@@ -24,6 +33,9 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
       svelte:
         specifier: ^5.56.1
         version: 5.56.7
@@ -266,6 +278,9 @@ packages:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
 
+  colord@2.9.3:
+    resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
+
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
@@ -345,6 +360,10 @@ packages:
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+
+  kysely@0.29.4:
+    resolution: {integrity: sha512-y5mVgQNkMbs1eK9Xyc0pmNdabN2wHhRYY/5r4W5HrUT1rYCEPeVNSj1RUJeSDKT3U0p+mXCvLgkrFuIafYI6BA==}
+    engines: {node: '>=22.0.0'}
 
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
@@ -452,6 +471,9 @@ packages:
     resolution: {integrity: sha512-W5ZNO5KRPB5TkYmGVD9F6YqhsglXJzE6etpbmT+f6EQElhiX/UTG551cnsRGvLG3fyZEg9HwaDmNmj5nwJ4z9g==}
     engines: {node: '>=10'}
 
+  node-addon-api@7.1.1:
+    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
+
   obug@2.1.4:
     resolution: {integrity: sha512-4a+OsYv9UktOJKE+l1A4OufDgdRF9PifWj+tJnHURo/P+WOxpG4GzUFL9qCalmWauao6ogiG+QvnCovwPoyAWA==}
     engines: {node: '>=12.20.0'}
@@ -531,6 +553,17 @@ packages:
   strip-json-comments@2.0.1:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
+
+  svelte-awesome-color-picker@4.1.3:
+    resolution: {integrity: sha512-fYio6XR2vp9WO0ihT6Vlw1Kj278gEZtqfIRde4YBx5OgGjBdQJxFE8jl6OibPQPrmaz625HZPZaSbRflL88/Mg==}
+    engines: {node: '>=24'}
+    peerDependencies:
+      svelte: ^5.0.0
+
+  svelte-awesome-slider@2.0.0:
+    resolution: {integrity: sha512-YBkOdYm1Feaqsn2JkJBRs+Kc/X3Qy/3GuVmI7GmoYDjBaHkjx9uH4khTuED22z57Hg3gGWeDhp/clIjWDdLNaw==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte-check@4.7.3:
     resolution: {integrity: sha512-DHdTCGX62R0fCxBEaT+USdASAnoaRBaaNczkRJl0K7o3WyoCeVUbVxo6fKqpOll/B+WMWCsiFK0eFrJSNBKZIg==}
@@ -632,6 +665,10 @@ packages:
 
   zimmerframe@1.1.4:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
+
+  zstd-napi@0.0.13:
+    resolution: {integrity: sha512-ErGF+Ko1PsbooU6oC/sc/diiWKwVa0kd/5AkFSs7kg5kwcEuOtSzOy3xUOadXQlAVNab9TxsxaUk3hOq3cj/lA==}
+    engines: {node: ^12.22.0 || ^14.17.0 || ^15.12.0 || >=16}
 
 snapshots:
 
@@ -828,6 +865,8 @@ snapshots:
 
   clsx@2.1.1: {}
 
+  colord@2.9.3: {}
+
   cookie@0.6.0: {}
 
   decompress-response@6.0.0:
@@ -878,6 +917,8 @@ snapshots:
       '@types/estree': 1.0.9
 
   kleur@4.1.5: {}
+
+  kysely@0.29.4: {}
 
   lightningcss-android-arm64@1.33.0:
     optional: true
@@ -951,6 +992,8 @@ snapshots:
   node-abi@3.94.0:
     dependencies:
       semver: 7.8.5
+
+  node-addon-api@7.1.1: {}
 
   obug@2.1.4: {}
 
@@ -1056,6 +1099,16 @@ snapshots:
 
   strip-json-comments@2.0.1: {}
 
+  svelte-awesome-color-picker@4.1.3(svelte@5.56.7):
+    dependencies:
+      colord: 2.9.3
+      svelte: 5.56.7
+      svelte-awesome-slider: 2.0.0(svelte@5.56.7)
+
+  svelte-awesome-slider@2.0.0(svelte@5.56.7):
+    dependencies:
+      svelte: 5.56.7
+
   svelte-check@4.7.3(picomatch@4.0.5)(svelte@5.56.7)(typescript@6.0.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -1143,3 +1196,9 @@ snapshots:
   wrappy@1.0.2: {}
 
   zimmerframe@1.1.4: {}
+
+  zstd-napi@0.0.13:
+    dependencies:
+      '@types/node': 26.1.1
+      node-addon-api: 7.1.1
+      prebuild-install: 7.1.3
