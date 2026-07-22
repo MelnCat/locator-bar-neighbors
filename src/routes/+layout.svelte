@@ -6,6 +6,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+    <title>Locator Bar Neighbor Finder</title>
 </svelte:head>
 
 {@render children()}
