@@ -1,0 +1,10 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 7" width="7" height="7">
+	<defs>
+		<image  width="7" height="7" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHBAMAAAA2fErgAAAAAXNSR0IB2cksfwAAAA9QTFRFAAAAAAAAvLy84ODg////b4OJTwAAAAV0Uk5TAP////8c0CZSAAAAHUlEQVR4nGNkFGB4zyik+P8eo7Dh/7NIBFgMJAsAzbEMWAnJ4+AAAAAASUVORK5CYII="/>
+		<image  width="7" height="7" id="img2" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHAQMAAAD+nMWQAAAAAXNSR0IB2cksfwAAAANQTFRFNIzktEmBsAAAAAxJREFUeJxjZGBEggAARgAIybMgDwAAAABJRU5ErkJggg=="/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+	<use id="Layer 1" style="mix-blend-mode: multiply" href="#img2" x="0" y="0"/>
+</svg>
