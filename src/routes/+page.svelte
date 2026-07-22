@@ -1,7 +1,11 @@
 <script lang="ts">
 	import ColorPicker from "svelte-awesome-color-picker";
 	import bar from "$lib/assets/img/bar.png";
-	import playerIcon from "$lib/assets/img/player_icon.png";
+	import playerIcon0 from "$lib/assets/img/icon/default_0.png";
+	import playerIcon1 from "$lib/assets/img/icon/default_1.png";
+	import playerIcon2 from "$lib/assets/img/icon/default_2.png";
+	import playerIcon3 from "$lib/assets/img/icon/default_3.png";
+	import playerIconBow from "$lib/assets/img/icon/bowtie.png";
 	import confetti from "canvas-confetti";
 
 	let innerWidth = $state(0);
@@ -14,6 +18,14 @@
 	let error: string | null = $state(null);
 	let mouseX = $state(0);
 	let emptyMessage = $state("");
+	let iconX = $derived(Math.min(1, Math.max(0, mouseX / innerWidth)));
+	const playerIcon = $derived.by(() => {
+		const magnitude = Math.abs(2 * (iconX - 0.5));
+        if (magnitude < 0.7) return playerIcon0;
+        if (magnitude < 0.85) return playerIcon1;
+        if (magnitude < 0.95) return playerIcon2;
+        return playerIcon3;
+	});
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
 
 	const search = async () => {
@@ -58,8 +70,7 @@
 				data = await (await fetch(`/api/search?color=${encodeURIComponent(hex)}`)).json();
 				chosenColor = hex;
 				if (data!.length === 0) {
-					emptyMessage =
-						"This player is not in the dataset, and has no known players with their color! Very impressive.";
+					emptyMessage = "This player is not in the dataset, and has no known players with their color! Very impressive.";
 				}
 			}
 			if (data!.length === 0) {
@@ -172,7 +183,7 @@
 					</filter>
 				</svg>
 
-				<div class="player-icon" style:--x={Math.min(1, Math.max(0, mouseX / innerWidth))} style:--img={`url("${playerIcon}")`}>
+				<div class="player-icon" style:--x={iconX} style:--img={`url("${playerIcon}")`}>
 					<img src={playerIcon} alt="Player icon" />
 				</div>
 			</div>
