@@ -14,6 +14,10 @@
 		name="description"
 		content="A utility to find your locator bar neighbors (other players with the same locator bar color as you)."
 	/>
+	<meta
+		property="og:description"
+		content="A utility to find your locator bar neighbors (other players with the same locator bar color as you)."
+	/>
 	<meta name="theme-color" content="#348de6" />
 	<title>Locator Bar Neighbor Finder</title>
 </svelte:head>
