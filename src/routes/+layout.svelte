@@ -60,5 +60,8 @@
 				background-color: #151a1a;
 			}
 		}
+        footer {
+            text-align: center;
+        }
 	}
 </style>

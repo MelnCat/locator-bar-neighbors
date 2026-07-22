@@ -2,6 +2,7 @@
 	import ColorPicker from "svelte-awesome-color-picker";
 	import bar from "$lib/assets/img/bar.png";
 	import playerIcon from "$lib/assets/img/player_icon.png";
+	import confetti from "canvas-confetti";
 
 	let innerWidth = $state(0);
 	let colorInput = $state("#ffffff");
@@ -12,28 +13,41 @@
 	let loading = $state(false);
 	let error: string | null = $state(null);
 	let mouseX = $state(0);
+	let emptyMessage = $state("");
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
 
 	const search = async () => {
 		error = null;
 		loading = true;
+		emptyMessage = "";
 		try {
 			if (inputType === "color") {
 				data = await (await fetch(`/api/search?color=${encodeURIComponent(colorInput.replace("#", ""))}`)).json();
 				chosenColor = colorInput.replace("#", "");
+				if (data!.length === 0) {
+					emptyMessage = "You found one of the 776628 colors without any players!";
+				}
 			} else if (inputType === "username") {
 				if (!usernameInput) {
 					error = "No username specified.";
 					loading = false;
 					return;
 				}
-				const json = await (await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput)}`)).json();
-				if (!json.data?.player?.raw_id) {
-					error = `User "${usernameInput}" not found.`;
-					loading = false;
-					return;
-				}
-				const uuid = json.data.player.raw_id;
+				const uuid = await (async () => {
+					if (usernameInput.match(/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i)) {
+						return usernameInput.replaceAll("-", "");
+					}
+					const json = await (
+						await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput)}`)
+					).json();
+					if (!json.data?.player?.raw_id) {
+						error = `User "${usernameInput}" not found.`;
+						loading = false;
+						return;
+					}
+					return json.data.player.raw_id as string;
+				})();
+				if (!uuid) return;
 				const hash =
 					parseInt(uuid.slice(0, 8), 16) ^
 					parseInt(uuid.slice(8, 16), 16) ^
@@ -43,7 +57,24 @@
 				const hex = (hash & 0xffffff).toString(16).padStart(6, "0");
 				data = await (await fetch(`/api/search?color=${encodeURIComponent(hex)}`)).json();
 				chosenColor = hex;
+				if (data!.length === 0) {
+					emptyMessage =
+						"This player has no known players with that color! Very impressive. Please contact me if you want to be added to the database.";
+				}
 			}
+			if (data!.length === 0) {
+				confetti();
+			}
+			data = await Promise.all(
+				data!.map(async x => {
+					const json = await (await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(x.id)}`)).json();
+					console.log(json);
+					if (!json.data?.player?.username) {
+						return x;
+					}
+					return { ...x, username: json.data.player.username };
+				}),
+			);
 		} catch (err) {
 			error = String(err);
 			data = [];
@@ -85,10 +116,10 @@
 		</section>
 		<div class="or">OR</div>
 		<section class="right" data-selected={inputType === "username" || null}>
-			<h2>Enter Username</h2>
+			<h2>Enter Username or UUID</h2>
 			<input
 				bind:value={usernameInput}
-				placeholder="Username"
+				placeholder="Username or UUID"
 				oninput={() => {
 					inputType = "username";
 				}}
@@ -110,15 +141,23 @@
 		{:else if error}
 			<p class="message error">{error}</p>
 		{:else if data}
-			{#each data.slice(0).sort((a, b) => a.username.localeCompare(b.username)) as player}
-				<div class="player">
-					<div class="uuid">
-						{`${player.id.slice(0, 8)}-${player.id.slice(8, 12)}-${player.id.slice(12, 16)}-${player.id.slice(16, 20)}-${player.id.slice(20, 32)}`}
+			{#if data.length}
+				{#each data.slice(0).sort((a, b) => a.username.localeCompare(b.username)) as player}
+					<div class="player">
+						<div class="uuid">
+							{`${player.id.slice(0, 8)}-${player.id.slice(8, 12)}-${player.id.slice(12, 16)}-${player.id.slice(16, 20)}-${player.id.slice(20, 32)}`}
+						</div>
+						<div class="name">{player.username}</div>
+						<div class="skin">
+							<img src={`https://nmsr.nickac.dev/fullbody/${player.id}`} alt={`${player.username} skin`} />
+						</div>
 					</div>
-					<div class="name">{player.username}</div>
-					<div class="skin"><img src={`https://nmsr.nickac.dev/fullbody/${player.id}`} alt={`${player.username} skin`} /></div>
+				{/each}
+			{:else}
+				<div class="message special">
+					{emptyMessage}
 				</div>
-			{/each}
+			{/if}
 		{:else}
 			<p class="message"></p>
 		{/if}
@@ -141,7 +180,12 @@
 	</div>
 </div>
 
-<footer>Made by melncat.</footer>
+<p>Fun fact: There are 776628 colors with no players in the dataset.</p>
+
+<footer>
+	<div>Made by melncat.</div>
+	<div><a href="https://github.com/MelnCat/locator-bar-neighbors">Source Code</a></div>
+</footer>
 
 <style>
 	.desc {
@@ -272,7 +316,7 @@
 		font-weight: bold;
 	}
 	section {
-		width: 15em;
+		width: 20em;
 		background-color: #ffffff11;
 		padding: 1em 1.5em;
 		opacity: 0.6;
@@ -300,15 +344,15 @@
 			flex-direction: column;
 		}
 		section {
-			width: 20em;
+			width: 22em;
 		}
-        h1 {
-            font-size: 2.7em;
-        }
+		h1 {
+			font-size: 2.7em;
+		}
 	}
 	@media screen and (max-width: 500px) {
 		.locator-bar {
-            font-size: 1.5em;
-        }
+			font-size: 1.5em;
+		}
 	}
 </style>
