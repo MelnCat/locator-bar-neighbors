@@ -1,42 +1,20 @@
-# sv
+# Locator Bar Neighbor Finder
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Hosted at https://locatorbar.crab.trade.
 
-## Creating a project
+All players in Minecraft have their locator bar color determined based on their UUID.
 
-If you're seeing this, you've probably already done this step. Congrats!
+There are 16.7 million colors, yet over 200 million Java edition players (I made this number up), 
+so by the [pigeonhole principle](https://en.wikipedia.org/wiki/Pigeonhole_principle), at least one color
+will have multiple players assigned to it. With so many players, chances are, there's multiple others with the exact same
+locator bar color as you.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+The server uses an empty database of players, so you'll have to populate it yourself. In my hosted server, I used https://archive.org/details/minecraft-uuids-2025-09-01 for 66 million usernames and their UUIDs. 
 
-To recreate this project with the same configuration:
+Also, you can search by both color and player, so if you want to find all people with #beef12 as their locator bar color, go ahead.
 
-```sh
-# recreate this project
-pnpm dlx sv@0.16.4 create --template minimal --types ts --install pnpm locator-colors
-```
+# Preview
 
-## Developing
+![Website](image.png)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+yeah

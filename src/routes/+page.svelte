@@ -59,7 +59,7 @@
 	bind:innerWidth
 />
 
-<h1>Locator Color Neighbor Finder</h1>
+<h1>Locator Bar Neighbor Finder</h1>
 <p class="desc">
 	Find other players with the same locator bar color as you! Uses a <a href="https://archive.org/details/minecraft-uuids-2025-09-01"
 		>dataset of 66m players</a
