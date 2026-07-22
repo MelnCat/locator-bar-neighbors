@@ -27,13 +27,13 @@
 					loading = false;
 					return;
 				}
-				const json = await (await fetch(`https://api.ashcon.app/mojang/v2/user/${encodeURIComponent(usernameInput)}`)).json();
-				if (!json.uuid) {
+				const json = await (await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput)}`)).json();
+				if (!json.data?.player?.raw_id) {
 					error = `User "${usernameInput}" not found.`;
 					loading = false;
 					return;
 				}
-				const uuid = json.uuid.replaceAll("-", "");
+				const uuid = json.data.player.raw_id;
 				const hash =
 					parseInt(uuid.slice(0, 8), 16) ^
 					parseInt(uuid.slice(8, 16), 16) ^
@@ -88,7 +88,7 @@
 			<h2>Enter Username</h2>
 			<input
 				bind:value={usernameInput}
-                placeholder="Username"
+				placeholder="Username"
 				oninput={() => {
 					inputType = "username";
 				}}
@@ -133,7 +133,7 @@
 					</filter>
 				</svg>
 
-				<div class="player-icon" style:--x={mouseX / innerWidth} style:--img={`url("${playerIcon}")`}>
+				<div class="player-icon" style:--x={Math.min(1, Math.max(0, mouseX / innerWidth))} style:--img={`url("${playerIcon}")`}>
 					<img src={playerIcon} alt="Player icon" />
 				</div>
 			</div>
@@ -141,13 +141,15 @@
 	</div>
 </div>
 
-<footer>
-    Made by melncat.
-</footer>
+<footer>Made by melncat.</footer>
 
 <style>
+	.desc {
+		text-align: center;
+		margin: 0 2em;
+	}
 	.search {
-        display: flex;
+		display: flex;
 		text-align: center;
 		background-color: #ffffff33;
 		border: none;
@@ -155,16 +157,16 @@
 		font-size: 1.2em;
 		padding: 0.4em 1em;
 		cursor: pointer;
-        margin: 0 auto;
-        transition: background-color 0.25s;
+		margin: 0 auto;
+		transition: background-color 0.25s;
 		&:hover {
 			background-color: #ffffff66;
 		}
-        &:disabled {
-            cursor: not-allowed;
+		&:disabled {
+			cursor: not-allowed;
 			background-color: #ffffff11;
-            color: #555555;
-        }
+			color: #555555;
+		}
 	}
 	.bar-preview {
 		image-rendering: pixelated;
@@ -215,13 +217,14 @@
 		color: #4c595c;
 		font-size: 0.8em;
 		text-align: center;
+		word-wrap: anywhere;
 	}
 	.name {
 		font-weight: bold;
 	}
 	.player-list {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 0.5em;
 		padding: 0.5em;
 		width: min(80vw, 80em);
@@ -230,8 +233,7 @@
 	.message,
 	.bar-preview {
 		min-height: 1.5em;
-		grid-row: 0;
-		grid-column-end: span 4;
+		grid-column: 1 / -1;
 		width: 100%;
 		text-align: center;
 		padding: 0.5em 1em;
@@ -270,18 +272,43 @@
 		font-weight: bold;
 	}
 	section {
-        width: 15em;
+		width: 15em;
 		background-color: #ffffff11;
 		padding: 1em 1.5em;
 		opacity: 0.6;
 		input {
 			background-color: #ffffff11;
-            padding: 0.6em 1em;
-            font-size: 1em;
-            width: 100%;
+			padding: 0.6em 1em;
+			font-size: 1em;
+			width: 100%;
 		}
 		&[data-selected] {
 			opacity: 1;
 		}
+	}
+
+	@media screen and (max-width: 830px) {
+		.player-list {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+	@media screen and (max-width: 630px) {
+		.player-list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.panes {
+			flex-direction: column;
+		}
+		section {
+			width: 20em;
+		}
+        h1 {
+            font-size: 2.7em;
+        }
+	}
+	@media screen and (max-width: 500px) {
+		.locator-bar {
+            font-size: 1.5em;
+        }
 	}
 </style>
