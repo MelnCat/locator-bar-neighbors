@@ -60,6 +60,11 @@
 />
 
 <h1>Locator Color Neighbor Finder</h1>
+<p class="desc">
+	Find other players with the same locator bar color as you! Uses a <a href="https://archive.org/details/minecraft-uuids-2025-09-01"
+		>dataset of 66m players</a
+	> by matdoesdev.
+</p>
 <form
 	onsubmit={e => {
 		e.preventDefault();
@@ -83,6 +88,7 @@
 			<h2>Enter Username</h2>
 			<input
 				bind:value={usernameInput}
+                placeholder="Username"
 				oninput={() => {
 					inputType = "username";
 				}}
@@ -93,7 +99,7 @@
 		</section>
 	</div>
 
-	<button class="search" type="submit">Search</button>
+	<button class="search" type="submit" disabled={loading}>Search</button>
 </form>
 
 <div class="result" style:--color={`#${displayColor}`}>
@@ -135,18 +141,31 @@
 	</div>
 </div>
 
+<footer>
+    Made by melncat.
+</footer>
+
 <style>
-.search {
-    text-align: center;
-    background-color: #ffffff33;
-    border: none;
-    color: inherit;
-    padding: 0.2em 0.6em;
-    cursor: pointer;
-    &:hover {
-    background-color: #ffffff66;
-    }
-}
+	.search {
+        display: flex;
+		text-align: center;
+		background-color: #ffffff33;
+		border: none;
+		color: inherit;
+		font-size: 1.2em;
+		padding: 0.4em 1em;
+		cursor: pointer;
+        margin: 0 auto;
+        transition: background-color 0.25s;
+		&:hover {
+			background-color: #ffffff66;
+		}
+        &:disabled {
+            cursor: not-allowed;
+			background-color: #ffffff11;
+            color: #555555;
+        }
+	}
 	.bar-preview {
 		image-rendering: pixelated;
 	}
@@ -221,7 +240,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-        transition: background-color 0.25s;
+		transition: background-color 0.25s;
 	}
 	.player-list-color {
 		background-color: var(--color);
@@ -233,7 +252,7 @@
 		flex-direction: column;
 		border: 0.2em color-mix(var(--color), 60% transparent) solid;
 		margin: 1em;
-        transition: border-color 0.25s;
+		transition: border-color 0.25s;
 	}
 	.error {
 		color: red;
@@ -251,7 +270,16 @@
 		font-weight: bold;
 	}
 	section {
+        width: 15em;
+		background-color: #ffffff11;
+		padding: 1em 1.5em;
 		opacity: 0.6;
+		input {
+			background-color: #ffffff11;
+            padding: 0.6em 1em;
+            font-size: 1em;
+            width: 100%;
+		}
 		&[data-selected] {
 			opacity: 1;
 		}

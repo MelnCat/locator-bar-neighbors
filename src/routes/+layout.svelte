@@ -24,6 +24,18 @@
             flex-direction: column;
             align-items: center;
 		}
+        a {
+            color: #597dad;
+            text-decoration: none;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            margin: 0;
+            margin-bottom: 1em;
+        }
 		button {
 			font-family: inherit;
 		}
