@@ -1,14 +1,9 @@
 <script lang="ts">
 	import ColorPicker from "svelte-awesome-color-picker";
-	import bar from "$lib/assets/img/bar.png";
-	import playerIcon0 from "$lib/assets/img/icon/default_0.png";
-	import playerIcon1 from "$lib/assets/img/icon/default_1.png";
-	import playerIcon2 from "$lib/assets/img/icon/default_2.png";
-	import playerIcon3 from "$lib/assets/img/icon/default_3.png";
+	import LocatorBar from "$lib/components/LocatorBar.svelte";
 	import playerIconBow from "$lib/assets/img/icon/bowtie.png";
 	import confetti from "canvas-confetti";
 
-	let innerWidth = $state(0);
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
 	let chosenColor: string | null = $state(null);
@@ -16,16 +11,7 @@
 	let data: { id: string; color: string; username: string }[] | null = $state([]);
 	let loading = $state(false);
 	let error: string | null = $state(null);
-	let mouseX = $state(0);
 	let emptyMessage = $state("");
-	let iconX = $derived(Math.min(1, Math.max(0, mouseX / innerWidth)));
-	const playerIcon = $derived.by(() => {
-		const magnitude = Math.abs(2 * (iconX - 0.5));
-        if (magnitude < 0.7) return playerIcon0;
-        if (magnitude < 0.85) return playerIcon1;
-        if (magnitude < 0.95) return playerIcon2;
-        return playerIcon3;
-	});
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
 
 	const search = async () => {
@@ -37,7 +23,7 @@
 				data = await (await fetch(`/api/search?color=${encodeURIComponent(colorInput.replace("#", ""))}`)).json();
 				chosenColor = colorInput.replace("#", "");
 				if (data!.length === 0) {
-					emptyMessage = "You found one of the 776628 colors without any players!";
+					emptyMessage = "You found one of the 330581 colors without any players!";
 				}
 			} else if (inputType === "username") {
 				if (!usernameInput) {
@@ -93,13 +79,6 @@
 		loading = false;
 	};
 </script>
-
-<svelte:window
-	onmousemove={e => {
-		mouseX = e.clientX;
-	}}
-	bind:innerWidth
-/>
 
 <h1>Locator Bar Neighbor Finder</h1>
 <p class="desc">
@@ -173,25 +152,12 @@
 			<p class="message"></p>
 		{/if}
 		<div class="bar-preview">
-			<div class="locator-bar">
-				<img class="bar" src={bar} alt="Locator bar" />
-				<svg width="0" height="0" style="position:absolute">
-					<filter id="tint">
-						<feFlood flood-color={`#${displayColor}`} result="flood" />
-						<feComposite in="flood" in2="SourceGraphic" operator="in" result="tinted" />
-						<feBlend in="tinted" in2="SourceGraphic" mode="multiply" />
-					</filter>
-				</svg>
-
-				<div class="player-icon" style:--x={iconX} style:--img={`url("${playerIcon}")`}>
-					<img src={playerIcon} alt="Player icon" />
-				</div>
-			</div>
+			<LocatorBar color={displayColor} />
 		</div>
 	</div>
 </div>
 
-<p>Fun fact: There are 776628 colors with no players in the dataset.</p>
+<p>Fun fact: There are 330581 colors with no players in the dataset.</p>
 
 <footer>
 	<div>Made by melncat.</div>
@@ -223,42 +189,12 @@
 			color: #555555;
 		}
 	}
-	.bar-preview {
-		image-rendering: pixelated;
-	}
-	.locator-bar {
-		font-size: 2em;
-		position: relative;
-	}
-	.player-icon {
-		width: 0.7em;
-		height: 0.7em;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		translate: -50% -50%;
-		transform: translateX(calc(8em * (var(--x) - 0.5)));
-		img {
-			width: 100%;
-			height: 100%;
-			display: block;
-			filter: url(#tint);
-		}
-	}
 	.skin {
 		width: 6em;
 		img {
 			width: 100%;
 			aspect-ratio: 205.6 / 348.95;
 		}
-	}
-	.bar {
-		position: absolute;
-		height: 0.5em;
-		width: 8.8em;
-		top: 50%;
-		left: 50%;
-		translate: -50% -50%;
 	}
 	.player {
 		display: flex;
@@ -359,11 +295,6 @@
 		}
 		h1 {
 			font-size: 2.7em;
-		}
-	}
-	@media screen and (max-width: 500px) {
-		.locator-bar {
-			font-size: 1.5em;
 		}
 	}
 </style>
