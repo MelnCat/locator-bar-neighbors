@@ -59,7 +59,7 @@
 				chosenColor = hex;
 				if (data!.length === 0) {
 					emptyMessage =
-						"This player has no known players with that color! Very impressive. Please contact me if you want to be added to the database.";
+						"This player is not in the dataset, and has no known players with their color! Very impressive.";
 				}
 			}
 			if (data!.length === 0) {
