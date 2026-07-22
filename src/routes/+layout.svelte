@@ -6,6 +6,15 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<meta property="og:title" content="Locator Bar Neighbor Finder" />
+	<meta name="keywords" content="locator bar" />
+	<meta name="author" content="melncat" />
+	<meta charset="utf-8" />
+	<meta
+		name="description"
+		content="A utility to find your locator bar neighbors (other players with the same locator bar color as you)."
+	/>
+	<meta name="theme-color" content="#348de6" />
 	<title>Locator Bar Neighbor Finder</title>
 </svelte:head>
 
@@ -60,8 +69,8 @@
 				background-color: #151a1a;
 			}
 		}
-        footer {
-            text-align: center;
-        }
+		footer {
+			text-align: center;
+		}
 	}
 </style>
