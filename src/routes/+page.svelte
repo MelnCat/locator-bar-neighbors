@@ -7,12 +7,18 @@
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
 	let chosenColor: string | null = $state(null);
-	let inputType: "color" | "username" = $state("color");
+	let inputType: "color" | "username" = $state("username");
 	let data: { id: string; color: string; username: string }[] | null = $state([]);
 	let loading = $state(false);
 	let error: string | null = $state(null);
 	let emptyMessage = $state("");
+	let colorOpen = $state(false);
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
+	$effect(() => {
+		if (colorOpen) {
+			inputType = "color";
+		}
+	});
 
 	const search = async () => {
 		error = null;
@@ -93,19 +99,7 @@
 	}}
 >
 	<div class="panes">
-		<section class="left" data-selected={inputType === "color" || null}>
-			<h2>Enter Color</h2>
-			<ColorPicker
-				bind:hex={colorInput}
-				onInput={() => {
-					inputType = "color";
-				}}
-				isAlpha={false}
-				label="Color"
-			/>
-		</section>
-		<div class="or">OR</div>
-		<section class="right" data-selected={inputType === "username" || null}>
+		<section class="left" data-selected={inputType === "username" || null}>
 			<h2>Enter Username or UUID</h2>
 			<input
 				bind:value={usernameInput}
@@ -116,6 +110,19 @@
 				onfocus={() => {
 					inputType = "username";
 				}}
+			/>
+		</section>
+		<div class="or">OR</div>
+		<section class="right" data-selected={inputType === "color" || null}>
+			<h2>Enter Color</h2>
+			<ColorPicker
+				bind:hex={colorInput}
+				onInput={e => {
+					if (e.hex !== "#ffffff") inputType = "color";
+				}}
+				bind:isOpen={colorOpen}
+				isAlpha={false}
+				label="Color"
 			/>
 		</section>
 	</div>
@@ -234,6 +241,7 @@
 		align-items: center;
 		justify-content: center;
 		transition: background-color 0.25s;
+
 	}
 	.player-list-color {
 		background-color: var(--color);

@@ -27,7 +27,6 @@
 	}}
 	bind:innerWidth
 />
-<div class="bar-preview">
 	<div class="locator-bar">
 		<img class="bar" src={bar} alt="Locator bar" />
 		<svg width="0" height="0" style="position:absolute">
@@ -42,15 +41,12 @@
 			<img src={playerIcon} alt="Player icon" />
 		</div>
 	</div>
-</div>
 
 <style>
-	.bar-preview {
-		image-rendering: pixelated;
-	}
 	.locator-bar {
 		font-size: 2em;
 		position: relative;
+        image-rendering: pixelated;
 	}
 	.player-icon {
 		width: 0.7em;
