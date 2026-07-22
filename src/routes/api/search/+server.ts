@@ -9,7 +9,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		error(400, "Invalid color");
 	}
 
-	const players = await db.selectFrom("player").where("color", "=", color).selectAll().execute();
+	const players = await db.selectFrom("player").where("color", "=", color.toLowerCase()).selectAll().execute();
 
 	return new Response(JSON.stringify(players), {
 		headers: {
