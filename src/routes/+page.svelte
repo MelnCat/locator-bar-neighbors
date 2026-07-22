@@ -3,12 +3,13 @@
 	import LocatorBar from "$lib/components/LocatorBar.svelte";
 	import playerIconBow from "$lib/assets/img/icon/bowtie.png";
 	import confetti from "canvas-confetti";
+	import Stats from "$lib/components/Stats.svelte";
 
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
 	let chosenColor: string | null = $state(null);
 	let inputType: "color" | "username" = $state("username");
-	let data: { id: string; color: string; username: string }[] | null = $state([]);
+	let data: { id: string; color: string; username: string; notInDb?: boolean }[] | null = $state([]);
 	let loading = $state(false);
 	let error: string | null = $state(null);
 	let emptyMessage = $state("");
@@ -26,7 +27,7 @@
 		emptyMessage = "";
 		try {
 			if (inputType === "color") {
-				data = await (await fetch(`/api/search?color=${encodeURIComponent(colorInput.replace("#", ""))}`)).json();
+				data = await (await fetch(`/api/search?color=${encodeURIComponent(colorInput.replace("#", "").toLowerCase())}`)).json();
 				chosenColor = colorInput.replace("#", "");
 				if (data!.length === 0) {
 					emptyMessage = "You found one of the 330581 colors without any players!";
@@ -39,7 +40,7 @@
 				}
 				const uuid = await (async () => {
 					if (usernameInput.match(/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i)) {
-						return usernameInput.replaceAll("-", "");
+						return usernameInput.replaceAll("-", "").toLowerCase();
 					}
 					const json = await (
 						await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput)}`)
@@ -59,10 +60,12 @@
 					parseInt(uuid.slice(24, 32), 16);
 
 				const hex = (hash & 0xffffff).toString(16).padStart(6, "0");
-				data = await (await fetch(`/api/search?color=${encodeURIComponent(hex)}`)).json();
+				data = await (await fetch(`/api/search?color=${encodeURIComponent(hex).toLowerCase()}`)).json();
 				chosenColor = hex;
 				if (data!.length === 0) {
 					emptyMessage = "This player is not in the dataset, and has no known players with their color! Very impressive.";
+				} else if (!data!.some(x => x.id === uuid)) {
+					data!.push({ id: uuid, color: hex, username: usernameInput, notInDb: true });
 				}
 			}
 			if (data!.length === 0) {
@@ -140,7 +143,7 @@
 		{:else if data}
 			{#if data.length}
 				{#each data.slice(0).sort((a, b) => a.username.localeCompare(b.username)) as player}
-					<div class="player">
+					<div class="player" data-notindb={player.notInDb}>
 						<div class="uuid">
 							{`${player.id.slice(0, 8)}-${player.id.slice(8, 12)}-${player.id.slice(12, 16)}-${player.id.slice(16, 20)}-${player.id.slice(20, 32)}`}
 						</div>
@@ -148,6 +151,9 @@
 						<div class="skin">
 							<img src={`https://nmsr.nickac.dev/fullbody/${player.id}`} alt={`${player.username} skin`} />
 						</div>
+						{#if player.notInDb}
+							<div class="notindb">Player not in database</div>
+						{/if}
 					</div>
 				{/each}
 			{:else}
@@ -166,12 +172,23 @@
 
 <p>Fun fact: There are 330581 colors with no players in the dataset.</p>
 
+<!-- <div class="stats">
+	<h2>Statistics</h2>
+	<Stats />
+</div> -->
+
 <footer>
 	<div>Made by melncat.</div>
 	<div><a href="https://github.com/MelnCat/locator-bar-neighbors">Source Code</a></div>
 </footer>
 
 <style>
+	.stats {
+		margin-top: 2em;
+	}
+	.notindb {
+		color: #ffffffdd;
+	}
 	.desc {
 		text-align: center;
 		margin: 0 2em;
@@ -210,6 +227,15 @@
 		background-color: #222424;
 		padding: 0.5em 1em;
 		gap: 0.5em;
+		&[data-notindb] {
+			background-color: #2d1d1c;
+			.name {
+				color: #e39898;
+			}
+			.uuid {
+				color: #972e2e;
+			}
+		}
 	}
 	.uuid {
 		color: #4c595c;
@@ -241,7 +267,6 @@
 		align-items: center;
 		justify-content: center;
 		transition: background-color 0.25s;
-
 	}
 	.player-list-color {
 		background-color: var(--color);
