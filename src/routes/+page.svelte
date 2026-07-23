@@ -4,6 +4,7 @@
 	import playerIconBow from "$lib/assets/img/icon/bowtie.png";
 	import confetti from "canvas-confetti";
 	import Stats from "$lib/components/Stats.svelte";
+	import { neighborsToPlayers, totalPlayers } from "$lib/util/stats";
 
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
@@ -164,6 +165,14 @@
 		{:else}
 			<p class="message"></p>
 		{/if}
+		{#if data?.length}
+			<p class="message thin">
+				{data.length} players have this color. ({(
+					((neighborsToPlayers.find(x => x.neighbors === data!.length)!.players ?? 0) / totalPlayers) *
+					100
+				).toFixed(2)}% chance of {data.length} neighbors)
+			</p>
+		{/if}
 		<div class="bar-preview">
 			<LocatorBar color={displayColor} />
 		</div>
@@ -172,10 +181,10 @@
 
 <p>Fun fact: There are 330581 colors with no players in the dataset.</p>
 
-<!-- <div class="stats">
+<div class="stats">
 	<h2>Statistics</h2>
 	<Stats />
-</div> -->
+</div>
 
 <footer>
 	<div>Made by melncat.</div>
@@ -183,6 +192,9 @@
 </footer>
 
 <style>
+	.thin {
+		margin: 0;
+	}
 	.stats {
 		margin-top: 2em;
 	}
