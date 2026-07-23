@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { neighborsToColors, neighborsToPlayers, totalPlayers } from "$lib/util/stats";
+	import { mostNeighborColors, neighborsToColors, neighborsToPlayers, totalPlayers } from "$lib/util/stats";
 	import { Chart } from "svelte-echarts";
 
 	import { init, use } from "echarts/core";
@@ -75,8 +75,20 @@
 		</div>
 	</div>
 </div>
+<div class="stat-panel">
+	<h3>Colors with the most neighbors (18 neighbors)</h3>
+	<ul>
+		{#each mostNeighborColors as color}
+			<li><span class="color" style:--color={`#${color}`}>#{color}</span></li>
+		{/each}
+	</ul>
+</div>
 
 <style>
+	.color {
+		background-color: var(--color);
+		color: contrast-color(var(--color));
+	}
 	.stat-panel {
 	}
 	.chart-list {
