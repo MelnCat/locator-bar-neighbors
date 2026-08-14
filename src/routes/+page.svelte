@@ -150,7 +150,7 @@
 						</div>
 						<div class="name">{player.username}</div>
 						<div class="skin">
-							<img src={`https://nmsr.nickac.dev/fullbody/${player.id}`} alt={`${player.username} skin`} />
+							<img src={`https://render.crafty.gg/2d/frontfull/${player.id}`} alt={`${player.username} skin`} />
 						</div>
 						{#if player.notInDb}
 							<div class="notindb">Player not in database</div>
@@ -229,7 +229,8 @@
 		width: 6em;
 		img {
 			width: 100%;
-			aspect-ratio: 205.6 / 348.95;
+			aspect-ratio: 128 / 256;
+            image-rendering: pixelated;
 		}
 	}
 	.player {
