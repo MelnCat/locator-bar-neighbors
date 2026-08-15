@@ -8,6 +8,7 @@ export interface PlayerTable {
 	id: string;
 	color: string;
 	username: string;
+	renderedColor: string;
 }
 
 export type Player = Selectable<PlayerTable>;

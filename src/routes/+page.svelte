@@ -1,21 +1,24 @@
 <script lang="ts">
+	import { page } from "$app/stores";
 	import ColorPicker from "svelte-awesome-color-picker";
 	import LocatorBar from "$lib/components/LocatorBar.svelte";
 	import playerIconBow from "$lib/assets/img/icon/bowtie.png";
 	import confetti from "canvas-confetti";
 	import Stats from "$lib/components/Stats.svelte";
 	import { neighborsToPlayers, totalPlayers } from "$lib/util/stats";
+	import { getRenderedColor } from "$lib/util/colors";
 
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
 	let chosenColor: string | null = $state(null);
 	let inputType: "color" | "username" = $state("username");
-	let data: { id: string; color: string; username: string; notInDb?: boolean }[] | null = $state([]);
+	let data: { players: { id: string; color: string; username: string; notInDb?: boolean }[]; sameRendered: number } | null = $state(null);
 	let loading = $state(false);
 	let error: string | null = $state(null);
 	let emptyMessage = $state("");
 	let colorOpen = $state(false);
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
+	const renderedDisplay = $derived(loading ? "555555" : error ? "ff2222" : chosenColor ? getRenderedColor(chosenColor) : "222222");
 	$effect(() => {
 		if (colorOpen) {
 			inputType = "color";
@@ -28,23 +31,23 @@
 		emptyMessage = "";
 		try {
 			if (inputType === "color") {
-				data = await (await fetch(`/api/search?color=${encodeURIComponent(colorInput.replace("#", "").toLowerCase())}`)).json();
+				data = await (await fetch(`/api/search2?color=${encodeURIComponent(colorInput.replace("#", "").toLowerCase())}`)).json();
 				chosenColor = colorInput.replace("#", "");
-				if (data!.length === 0) {
+				if (data!.players.length === 0) {
 					emptyMessage = "You found one of the 330581 colors without any players!";
 				}
 			} else if (inputType === "username") {
-				if (!usernameInput) {
+				if (!usernameInput.trim()) {
 					error = "No username specified.";
 					loading = false;
 					return;
 				}
 				const uuid = await (async () => {
-					if (usernameInput.match(/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i)) {
-						return usernameInput.replaceAll("-", "").toLowerCase();
+					if (usernameInput.trim().match(/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i)) {
+						return usernameInput.trim().replaceAll("-", "").toLowerCase();
 					}
 					const json = await (
-						await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput)}`)
+						await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(usernameInput.trim())}`)
 					).json();
 					if (!json.data?.player?.raw_id) {
 						error = `User "${usernameInput}" not found.`;
@@ -61,19 +64,19 @@
 					parseInt(uuid.slice(24, 32), 16);
 
 				const hex = (hash & 0xffffff).toString(16).padStart(6, "0");
-				data = await (await fetch(`/api/search?color=${encodeURIComponent(hex).toLowerCase()}`)).json();
+				data = await (await fetch(`/api/search2?color=${encodeURIComponent(hex).toLowerCase()}`)).json();
 				chosenColor = hex;
-				if (data!.length === 0) {
+				if (data!.players.length === 0) {
 					emptyMessage = "This player is not in the dataset, and has no known players with their color! Very impressive.";
-				} else if (!data!.some(x => x.id === uuid)) {
-					data!.push({ id: uuid, color: hex, username: usernameInput, notInDb: true });
+				} else if (!data!.players.some(x => x.id === uuid)) {
+					data!.players.push({ id: uuid, color: hex, username: usernameInput, notInDb: true });
 				}
 			}
-			if (data!.length === 0) {
+			if (data!.players.length === 0) {
 				confetti();
 			}
-			data = await Promise.all(
-				data!.map(async x => {
+			data!.players = await Promise.all(
+				data!.players.map(async x => {
 					const json = await (await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(x.id)}`)).json();
 					console.log(json);
 					if (!json.data?.player?.username) {
@@ -83,8 +86,9 @@
 				}),
 			);
 		} catch (err) {
+			console.error(err);
 			error = String(err);
-			data = [];
+			data = null;
 		}
 		loading = false;
 	};
@@ -134,16 +138,23 @@
 	<button class="search" type="submit" disabled={loading}>Search</button>
 </form>
 
-<div class="result" style:--color={`#${displayColor}`}>
+<div class="result" style:--color={`#${displayColor}`} style:--rendered={`#${renderedDisplay}`}>
 	<div class="player-list">
-		<div class="player-list-color">{chosenColor && !loading && !error ? `#${chosenColor.toUpperCase()}` : ""}</div>
+		<div class="player-list-color">
+			<div class="color-left">{chosenColor && !loading && !error ? `Internal: #${chosenColor.toUpperCase()}` : ""}</div>
+			{#if chosenColor && !loading && !error}
+				<div class="color-right">
+					<b>In-Game:</b> #{renderedDisplay.toUpperCase()}
+				</div>
+			{/if}
+		</div>
 		{#if loading}
 			<p class="message">Searching...</p>
 		{:else if error}
 			<p class="message error">{error}</p>
 		{:else if data}
-			{#if data.length}
-				{#each data.slice(0).sort((a, b) => a.username.localeCompare(b.username)) as player}
+			{#if data.players.length}
+				{#each data.players.slice(0).sort((a, b) => a.username.localeCompare(b.username)) as player}
 					<div class="player" data-notindb={player.notInDb}>
 						<div class="uuid">
 							{`${player.id.slice(0, 8)}-${player.id.slice(8, 12)}-${player.id.slice(12, 16)}-${player.id.slice(16, 20)}-${player.id.slice(20, 32)}`}
@@ -165,16 +176,21 @@
 		{:else}
 			<p class="message"></p>
 		{/if}
-		{#if data?.length}
+		{#if data?.players.length}
 			<p class="message thin">
-				{data.length} players have this color. ({(
-					((neighborsToPlayers.find(x => x.neighbors === data!.length)!.players ?? 0) / totalPlayers) *
+				{data.players.length} players have this color. ({(
+					((neighborsToPlayers.find(x => x.neighbors === data!.players.length)!.players ?? 0) / totalPlayers) *
 					100
-				).toFixed(2)}% chance of {data.length} neighbors)
+				).toFixed(2)}% chance of {data.players.length} neighbors)
+			</p>
+		{/if}
+		{#if data?.sameRendered}
+			<p class="message thin">
+				{data.sameRendered} players have the same in-game color, but with different internal colors.
 			</p>
 		{/if}
 		<div class="bar-preview">
-			<LocatorBar color={displayColor} />
+			<LocatorBar color={renderedDisplay} />
 		</div>
 	</div>
 </div>
@@ -230,7 +246,7 @@
 		img {
 			width: 100%;
 			aspect-ratio: 128 / 256;
-            image-rendering: pixelated;
+			image-rendering: pixelated;
 		}
 	}
 	.player {
@@ -282,8 +298,22 @@
 		transition: background-color 0.25s;
 	}
 	.player-list-color {
+		display: flex;
+		padding: 0;
+		div {
+			flex: 1;
+			padding: 0.5em 1em;
+			height: 100%;
+			transition: background-color 0.25s;
+		}
+	}
+	.color-left {
 		background-color: var(--color);
 		color: contrast-color(var(--color));
+	}
+	.color-right {
+		background-color: var(--rendered);
+		color: contrast-color(var(--rendered));
 	}
 	.result {
 		--color: #ffffff11;
