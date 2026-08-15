@@ -31,6 +31,9 @@
 		emptyMessage = "";
 		try {
 			if (inputType === "color") {
+				if (colorInput.replace("#", "").toLowerCase().length > 6) {
+					colorInput = `#${colorInput.replace("#", "").slice(0, 6)}`;
+				}
 				data = await (await fetch(`/api/search2?color=${encodeURIComponent(colorInput.replace("#", "").toLowerCase())}`)).json();
 				chosenColor = colorInput.replace("#", "");
 				if (data!.players.length === 0) {
