@@ -103,6 +103,9 @@
 		>dataset of 66m players</a
 	> by matdoesdev.
 </p>
+<p class="desc">
+    In-game color is the color that will actually display in-game, as the game normalizes the brightness of all colors to 90%.
+</p>
 <form
 	onsubmit={e => {
 		e.preventDefault();
@@ -222,7 +225,7 @@
 	}
 	.desc {
 		text-align: center;
-		margin: 0 2em;
+		margin: 0.5em 2em;
 	}
 	.search {
 		display: flex;
