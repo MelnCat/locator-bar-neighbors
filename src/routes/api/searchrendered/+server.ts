@@ -12,16 +12,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const rendered = getRenderedColor(color);
 
-	const players = await db.selectFrom("player").where("color", "=", color.toLowerCase()).selectAll().execute();
-	const sameRendered = (
-		await db
-			.selectFrom("player")
-			.where("renderedColor", "=", rendered.toLowerCase())
-			.select(({ fn }) => fn.count("id").as("count"))
-			.execute()
-	)[0].count;
+	const same = (await db
+		.selectFrom("player")
+		.where("renderedColor", "=", rendered.toLowerCase())
+		.select(["username", "id"])
+		.execute());
 
-	return new Response(JSON.stringify({ players, sameRendered }), {
+	return new Response(JSON.stringify(same), {
 		headers: {
 			"Content-Type": "application/json",
 			"Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",

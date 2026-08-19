@@ -7,6 +7,7 @@
 	import Stats from "$lib/components/Stats.svelte";
 	import { neighborsToPlayers, totalPlayers } from "$lib/util/stats";
 	import { getRenderedColor } from "$lib/util/colors";
+	import { RawNode } from "kysely";
 
 	let colorInput = $state("#ffffff");
 	let usernameInput = $state("");
@@ -17,6 +18,8 @@
 	let error: string | null = $state(null);
 	let emptyMessage = $state("");
 	let colorOpen = $state(false);
+	let fullOpen = $state(false);
+	let renderedPlayers: { id: string; username: string }[] | null = $state(null);
 	const displayColor = $derived(loading ? "555555" : error ? "ff2222" : (chosenColor ?? "222222"));
 	const renderedDisplay = $derived(loading ? "555555" : error ? "ff2222" : chosenColor ? getRenderedColor(chosenColor) : "222222");
 	$effect(() => {
@@ -24,11 +27,22 @@
 			inputType = "color";
 		}
 	});
+	$effect(() => {
+		if (fullOpen) {
+			if (!renderedPlayers) {
+				(async () => {
+					renderedPlayers = await (await fetch(`/api/searchrendered?color=${chosenColor}`)).json();
+				})();
+			}
+		}
+	});
 
 	const search = async () => {
 		error = null;
 		loading = true;
 		emptyMessage = "";
+		renderedPlayers = null;
+		fullOpen = false;
 		try {
 			if (inputType === "color") {
 				if (colorInput.replace("#", "").toLowerCase().length > 6) {
@@ -81,7 +95,6 @@
 			data!.players = await Promise.all(
 				data!.players.map(async x => {
 					const json = await (await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(x.id)}`)).json();
-					console.log(json);
 					if (!json.data?.player?.username) {
 						return x;
 					}
@@ -104,7 +117,7 @@
 	> by matdoesdev.
 </p>
 <p class="desc">
-    In-game color is the color that will actually display in-game, as the game normalizes the brightness of all colors to 90%.
+	In-game color is the color that will actually display in-game, as the game normalizes the brightness of all colors to 90%.
 </p>
 <form
 	onsubmit={e => {
@@ -167,7 +180,7 @@
 						</div>
 						<div class="name">{player.username}</div>
 						<div class="skin">
-							<img src={`https://render.crafty.gg/2d/frontfull/${player.id}`} alt={`${player.username} skin`} />
+							<img src={`https://mineskin.eu/armor/body/${player.id}/100.png`} alt={`${player.username} skin`} />
 						</div>
 						{#if player.notInDb}
 							<div class="notindb">Player not in database</div>
@@ -191,9 +204,21 @@
 			</p>
 		{/if}
 		{#if data?.sameRendered}
-			<p class="message thin">
-				{data.sameRendered} players have the same in-game color, but with different internal colors.
-			</p>
+			<div class="message thin">
+				<p>{data.sameRendered} players have the same in-game color, but with different internal colors.</p>
+				<details bind:open={fullOpen}>
+					<summary>See all (it might be long)</summary>
+					<div class="full-list">
+						{#each renderedPlayers as player}
+							<div class="user">
+								{player.username} <span class="uuid">({player.id})</span>
+							</div>
+						{:else}
+							<div>Loading...</div>
+						{/each}
+					</div>
+				</details>
+			</div>
 		{/if}
 		<div class="bar-preview">
 			<LocatorBar color={renderedDisplay} />
@@ -214,6 +239,20 @@
 </footer>
 
 <style>
+	.full-list {
+		font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+		border: 1px solid #aaaaaa;
+		padding: 0.25em 0.5em;
+		font-size: 0.5em;
+		font-weight: normal;
+		text-align: left;
+		.uuid {
+			color: #888888;
+		}
+	}
+	summary {
+		cursor: pointer;
+	}
 	.thin {
 		margin: 0;
 	}
@@ -251,8 +290,8 @@
 		width: 6em;
 		img {
 			width: 100%;
-			aspect-ratio: 128 / 256;
 			image-rendering: pixelated;
+			aspect-ratio: 1 / 2;
 		}
 	}
 	.player {
@@ -302,6 +341,9 @@
 		align-items: center;
 		justify-content: center;
 		transition: background-color 0.25s;
+	}
+	.message {
+		flex-direction: column;
 	}
 	.player-list-color {
 		display: flex;
